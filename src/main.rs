@@ -3,15 +3,16 @@ use bevy::{
     render::view::RenderLayers,
 };
 
-pub mod tutorial;
+pub mod objects;
 pub mod camera;
 pub mod plugin;
 pub mod states;
-pub mod player;
+pub mod properties;
+pub mod tutorial;
 
 use plugin::camera::CameraPlugin;
 
-const BACKGROUND: RenderLayers = RenderLayers::layer(1);
+// const BACKGROUND: RenderLayers = RenderLayers::layer(1);
 const FOREGROUND: RenderLayers = RenderLayers::layer(2);
 
 use states::{

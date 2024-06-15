@@ -1,13 +1,13 @@
 use bevy::prelude::*;
 
-use crate::{
-    FOREGROUND,
-    BACKGROUND
-};
+use crate::FOREGROUND;
 
 // Useful for marking the "main" camera if we have many
 #[derive(Component)]
 pub struct MainCamera;
+
+#[derive(Component)]
+pub struct BackgroundCamera;
 
 /// Initialize camera
 /// 
@@ -21,10 +21,11 @@ pub fn initialize_camera(
         MainCamera
     ));
     
-    commands.spawn((
-        Camera2dBundle::default(),
-        BACKGROUND
-    ));
+    // commands.spawn((
+    //     Camera2dBundle::default(),
+    //     BACKGROUND,
+    //     BackgroundCamera
+    // ));
 }
 
 /// Zoom control system

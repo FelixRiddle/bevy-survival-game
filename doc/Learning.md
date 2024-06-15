@@ -10,4 +10,4 @@
 
 - [2D platformer](https://affanshahid.dev/posts/learning-game-dev-bevy-1/)
 - [Your first game](https://rhulha.github.io/bevy-website/learn/book/your-first-game/index.html)
-- [ ] [Pong tutorial](https://taintedcoders.com/bevy/pong-tutorial/)
+- [x] [Pong tutorial](https://taintedcoders.com/bevy/pong-tutorial/)
