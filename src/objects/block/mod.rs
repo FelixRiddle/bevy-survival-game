@@ -1,10 +1,10 @@
 use bevy::prelude::*;
+use bevy::render::view::RenderLayers;
 
-use crate::properties::{
-    Name,
-    Position,
-    Velocity,
-    Hitbox,
+use crate::{
+    properties::{
+        Hitbox, Name, Position, Velocity
+    }, FOREGROUND
 };
 
 #[derive(Component)]
@@ -21,8 +21,9 @@ pub enum BlockType {
     OakLeaves
 }
 
-/// Wood and leaves will be intangible
-/// so that the player can go through them
+/// Some blocks should be passed through
+/// 
+/// Wood, leaves, torches, etc. are intangible.
 #[derive(Component)]
 pub enum Tangible {
     Tangible,
@@ -46,6 +47,9 @@ pub struct BlockBundle {
     // A block can move?
     pub velocity: Velocity,
     pub hitbox: Hitbox,
+    
+    // Layer is dependent on tangibility
+    pub layer: RenderLayers,
     pub tangible: Tangible,
     
     // Rendering
@@ -66,7 +70,8 @@ impl BlockAndSprite {
         match block_type {
             BlockType::Grass => {
                 let name_id = "grass";
-                let sprite_path = format!("sprite/block/{name_id}/{name_id}.jpg");
+                // Is it possible to load jpg?, most blocks don't have transparency.
+                let sprite_path = format!("sprite/block/{name_id}/{name_id}.png");
                 let sprite = SpriteBundle {
                     transform: Transform::from_xyz(0., 0., 0.),
                     texture: asset_server.load(sprite_path),
@@ -100,13 +105,16 @@ impl BlockBundle {
         
         BlockBundle {
             block: Block { },
-            tangible: Tangible::Tangible,
             name: block_and_sprite.name,
             block_type,
             position: Position(Vec2::new(0., 0.)),
             velocity: Velocity(Vec2::new(0., 0.)),
             // The default, most blocks will have a size of 32x32
             hitbox: Hitbox(Vec2::new(32., 32.)),
+            
+            layer: FOREGROUND,
+            tangible: Tangible::Tangible,
+            
             sprite: block_and_sprite.sprite
         }
     }

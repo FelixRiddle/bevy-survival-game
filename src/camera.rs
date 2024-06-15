@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+// use crate::BACKGROUND;
 use crate::FOREGROUND;
 
 // Useful for marking the "main" camera if we have many
@@ -61,6 +62,26 @@ pub fn mouse_coordinates(
     
     if let Some(world_position) = window.cursor_position()
         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate())
+    {
+        info!("World coords: {}/{}", world_position.x, world_position.y);
+    }
+}
+
+/// Cast cursor ray
+/// 
+/// The same as mouse coordinates xd
+pub fn cast_cursor_ray(
+    windows: Query<&Window>,
+    cameras: Query<(&Camera, &GlobalTransform)>
+) {
+    let window = windows.single();
+    let (camera, position) = cameras.single();
+    
+    // Check if the cursor is inside the window and get its position
+    // then, ask bevy to convert into world coordinates, and truncate to discard z
+    if let Some(world_position) = window.cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(position, cursor))
         .map(|ray| ray.origin.truncate())
     {
         info!("World coords: {}/{}", world_position.x, world_position.y);

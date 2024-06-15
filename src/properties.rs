@@ -1,5 +1,11 @@
 use bevy::prelude::*;
 
+/// Entity speed
+/// 
+/// 
+#[derive(Component)]
+pub struct Speed(pub f32);
+
 /// The visible name of an object or entity
 /// 
 /// 
