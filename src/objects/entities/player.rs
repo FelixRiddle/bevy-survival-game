@@ -108,7 +108,7 @@ pub fn handle_player_input(
         } else if keyboard_input.pressed(KeyCode::KeyA) {
             velocity.0.x = -speed;
         } else {
-            velocity.0.y = 0.;
+            velocity.0 = Vec2::new(0., 0.);
         }
     }
 }

@@ -42,7 +42,7 @@ pub struct BlockBundle {
     pub name: Name,
     pub block_type: BlockType,
     
-    // Shape amd physics
+    // Shape and physics
     pub position: Position,
     // A block can move?
     pub velocity: Velocity,
