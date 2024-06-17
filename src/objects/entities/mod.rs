@@ -1,14 +1,17 @@
 use bevy::prelude::*;
 use bevy::ecs::component::Component;
 use bevy::render::view::RenderLayers;
+use bevy_rapier2d::dynamics::{
+    RigidBody,
+    Velocity,
+};
 
 pub mod player;
 
 use crate::FOREGROUND;
 use crate::properties::{
+    Gravity,
     Name,
-    Position,
-    Velocity,
     Hitbox,
     Speed,
 };
@@ -25,7 +28,9 @@ pub struct EntityBundle {
     pub name: Name,
     
     // Physics and other things
-    pub position: Position,
+    // Fixed on dynamic though
+    pub gravity: Gravity,
+    pub rigidbody: RigidBody,
     pub velocity: Velocity,
     pub hitbox: Hitbox,
     pub speed: Speed,
@@ -57,7 +62,7 @@ impl EntityBundle {
         name: &str
     ) -> EntityBundle {
         let name_id = name_id(name);
-        let sprite_path = format!("sprite/entities/{name_id}/{name_id}.png");
+        let sprite_path = format!("object/character/{name_id}/{name_id}.png");
         let sprite = SpriteBundle {
             transform: Transform::from_xyz(0., 0., 0.),
             texture: asset_server.load(sprite_path),
@@ -71,30 +76,18 @@ impl EntityBundle {
             // Visual name
             name: Name(name.to_string()),
             
-            position: Position(Vec2::new(0., 0.)),
-            velocity: Velocity(Vec2::new(0., 0.)),
+            gravity: Gravity(5.),
+            rigidbody: RigidBody::Dynamic,
+            velocity: Velocity {
+                linvel: Vec2::new(0., 0.),
+                angvel: 80.,
+            },
             hitbox: Hitbox(Vec2::new(32., 64.)),
-            speed: Speed(5.),
+            speed: Speed(300.),
             
             // Rendering
             layer: FOREGROUND,
             sprite
         }
-    }
-}
-
-/// Move entities
-/// 
-/// 
-pub fn move_entities(
-    mut entities: Query<(&mut Position, &mut Transform, &Velocity), With<Entity>>,
-) {
-    for(mut position, mut transform, velocity) in &mut entities {
-        let new_position = position.0 + velocity.0;
-        
-        position.0 = new_position;
-        
-        let new_position = Vec3::new(new_position.x, new_position.y, 0.);
-        transform.translation = new_position;
     }
 }

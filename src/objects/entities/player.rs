@@ -1,10 +1,8 @@
 use bevy::prelude::*;
 use bevy::ecs::{component::Component, system::Commands};
+use bevy_rapier2d::dynamics::Velocity;
 
-use crate::properties::{
-    Velocity,
-    Speed,
-};
+use crate::properties::Speed;
 use super::EntityBundle;
 
 #[derive(Component)]
@@ -47,15 +45,19 @@ pub fn handle_player_input(
         let speed = speed.0;
         
         if keyboard_input.pressed(KeyCode::KeyW) {
-            velocity.0.y = speed;
+            velocity.linvel.y = speed;
         } else if keyboard_input.pressed(KeyCode::KeyS) {
-            velocity.0.y = -speed;
-        } else if keyboard_input.pressed(KeyCode::KeyD) {
-            velocity.0.x = speed;
-        } else if keyboard_input.pressed(KeyCode::KeyA) {
-            velocity.0.x = -speed;
+            velocity.linvel.y = -speed;
         } else {
-            velocity.0 = Vec2::new(0., 0.);
+            velocity.linvel = Vec2::new(velocity.linvel.x, 0.);
+        }
+        
+        if keyboard_input.pressed(KeyCode::KeyD) {
+            velocity.linvel.x = speed;
+        } else if keyboard_input.pressed(KeyCode::KeyA) {
+            velocity.linvel.x = -speed;
+        } else {
+            velocity.linvel = Vec2::new(0., velocity.linvel.y);
         }
     }
 }

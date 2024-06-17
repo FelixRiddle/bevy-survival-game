@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use bevy::render::view::RenderLayers;
+use bevy_rapier2d::dynamics::RigidBody;
 
 use crate::{
     properties::{
-        Hitbox, Name, Position, Velocity
+        Hitbox, Name
     }, FOREGROUND
 };
 
@@ -40,12 +41,14 @@ pub struct BlockBundle {
     // Information
     pub block: Block,
     pub name: Name,
+    // TODO: Should be removed
+    // I should add configuration in json files on every object and then dynamically load them.
     pub block_type: BlockType,
     
     // Shape and physics
-    pub position: Position,
+    pub rigidbody: RigidBody,
     // A block can move?
-    pub velocity: Velocity,
+    // pub velocity: Velocity,
     pub hitbox: Hitbox,
     
     // Layer is dependent on tangibility
@@ -71,7 +74,7 @@ impl BlockAndSprite {
             BlockType::Grass => {
                 let name_id = "grass";
                 // Is it possible to load jpg?, most blocks don't have transparency.
-                let sprite_path = format!("sprite/block/{name_id}/{name_id}.png");
+                let sprite_path = format!("object/block/{name_id}/{name_id}.png");
                 let sprite = SpriteBundle {
                     transform: Transform::from_xyz(0., 0., 0.),
                     texture: asset_server.load(sprite_path),
@@ -107,8 +110,9 @@ impl BlockBundle {
             block: Block { },
             name: block_and_sprite.name,
             block_type,
-            position: Position(Vec2::new(0., 0.)),
-            velocity: Velocity(Vec2::new(0., 0.)),
+            
+            rigidbody: RigidBody::Fixed,
+            // velocity: Velocity(Vec2::new(0., 0.)),
             // The default, most blocks will have a size of 32x32
             hitbox: Hitbox(Vec2::new(32., 32.)),
             

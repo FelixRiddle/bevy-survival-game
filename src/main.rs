@@ -1,24 +1,23 @@
 use bevy::{
-    app::App, prelude::*, utils::hashbrown::Equivalent, DefaultPlugins,
+    app::App, prelude::*, DefaultPlugins,
     render::view::RenderLayers,
 };
+use bevy_rapier2d::prelude::*;
 
 pub mod objects;
 pub mod camera;
 pub mod plugin;
+pub mod state_transition;
 pub mod states;
 pub mod properties;
 pub mod tutorial;
 
 use objects::{
     block,
-    entities::{
-        move_entities,
-        player::{
-            self,
-            handle_player_input
-        },
-    }
+    entities::player::{
+        self,
+        handle_player_input
+    },
 };
 
 // const BACKGROUND: RenderLayers = RenderLayers::layer(1);
@@ -32,42 +31,6 @@ use states::{
     InGameState,
 };
 
-/// Open settings menu
-/// 
-/// 
-fn open_settings_menu(mut next_state: ResMut<NextState<AppState>>, current_state: Res<State<AppState>>, input: Res<ButtonInput<KeyCode>>) {
-    if input.just_pressed(KeyCode::Escape) {
-        // If it's in the settings menu
-        if current_state.equivalent(&AppState::SettingsMenu) {
-            next_state.set(AppState::MainMenu);
-        }
-    }
-}
-
-/// Main menu
-/// 
-/// 
-fn main_menu() {
-    
-}
-
-/// Play game
-/// 
-/// 
-fn play_game() {
-    
-}
-
-/// In game menu
-/// 
-/// 
-fn in_game_menu(mut next_state: ResMut<NextState<AppState>>, _current_state: Res<State<AppState>>, input: Res<ButtonInput<KeyCode>>) {
-    // If it's in the dead menu
-    if input.just_pressed(KeyCode::Escape) {
-        next_state.set(AppState::MainMenu);
-    }
-}
-
 /// Main
 /// 
 /// 
@@ -76,6 +39,8 @@ fn main() {
         .add_plugins(DefaultPlugins.set(
             ImagePlugin::default_nearest()
         ))
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.))
+        .add_plugins(RapierDebugRenderPlugin::default())
         // Add state to app definition
         .init_state::<AppState>()
         .init_state::<GameMode>()
@@ -89,15 +54,14 @@ fn main() {
         ))
         .add_systems(Update, (
             handle_player_input,
-            move_entities.after(handle_player_input),
         ))
         // Update states
         // We can add systems to trigger during transitions
-        .add_systems(OnEnter(AppState::MainMenu), main_menu)
+        .add_systems(OnEnter(AppState::MainMenu), state_transition::main_menu)
         // Set pause state to running when the player is playing
-        .add_systems(OnEnter(PauseState::Running), play_game)
-        .add_systems(OnEnter(AppState::SettingsMenu), open_settings_menu)
-        .add_systems(OnEnter(InGameState::InGameMenu), in_game_menu)
+        .add_systems(OnEnter(PauseState::Running), state_transition::play_game)
+        .add_systems(OnEnter(AppState::SettingsMenu), state_transition::open_settings_menu)
+        .add_systems(OnEnter(InGameState::InGameMenu), state_transition::in_game_menu)
         .run();
     
 }
