@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 use bevy::ecs::component::Component;
 use bevy::render::view::RenderLayers;
-use bevy_rapier2d::dynamics::{
-    RigidBody,
-    Velocity,
-};
+use bevy_rapier2d::prelude::*;
 
 pub mod player;
 
@@ -12,7 +9,6 @@ use crate::FOREGROUND;
 use crate::properties::{
     Gravity,
     Name,
-    Hitbox,
     Speed,
 };
 
@@ -28,12 +24,11 @@ pub struct EntityBundle {
     pub name: Name,
     
     // Physics and other things
-    // Fixed on dynamic though
     pub gravity: Gravity,
-    pub rigidbody: RigidBody,
-    pub velocity: Velocity,
-    pub hitbox: Hitbox,
     pub speed: Speed,
+    pub rigidbody: RigidBody,
+    pub collider: Collider,
+    pub kinematic_character_controller: KinematicCharacterController,
     
     // Rendering
     pub layer: RenderLayers,
@@ -77,13 +72,13 @@ impl EntityBundle {
             name: Name(name.to_string()),
             
             gravity: Gravity(5.),
-            rigidbody: RigidBody::Dynamic,
-            velocity: Velocity {
-                linvel: Vec2::new(0., 0.),
-                angvel: 80.,
+            speed: Speed(2.),
+            rigidbody: RigidBody::KinematicPositionBased,
+            collider: Collider::capsule(Vec2::new(0., 0.), Vec2::new(32., 64.), 32.),
+            kinematic_character_controller: KinematicCharacterController {
+                up: Vec2::new(0., 1.),
+                ..default()
             },
-            hitbox: Hitbox(Vec2::new(32., 64.)),
-            speed: Speed(300.),
             
             // Rendering
             layer: FOREGROUND,

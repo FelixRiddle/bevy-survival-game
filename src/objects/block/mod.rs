@@ -1,11 +1,10 @@
 use bevy::prelude::*;
 use bevy::render::view::RenderLayers;
-use bevy_rapier2d::dynamics::RigidBody;
+use bevy_rapier2d::prelude::*;
 
 use crate::{
-    properties::{
-        Hitbox, Name
-    }, FOREGROUND
+    properties::Name,
+    FOREGROUND
 };
 
 #[derive(Component)]
@@ -47,9 +46,7 @@ pub struct BlockBundle {
     
     // Shape and physics
     pub rigidbody: RigidBody,
-    // A block can move?
-    // pub velocity: Velocity,
-    pub hitbox: Hitbox,
+    pub collider: Collider,
     
     // Layer is dependent on tangibility
     pub layer: RenderLayers,
@@ -112,9 +109,7 @@ impl BlockBundle {
             block_type,
             
             rigidbody: RigidBody::Fixed,
-            // velocity: Velocity(Vec2::new(0., 0.)),
-            // The default, most blocks will have a size of 32x32
-            hitbox: Hitbox(Vec2::new(32., 32.)),
+            collider: Collider::cuboid(32., 32.),
             
             layer: FOREGROUND,
             tangible: Tangible::Tangible,
@@ -135,6 +130,15 @@ pub fn spawn_grass_block(
         asset_server,
         BlockType::Grass
     ));
+}
+
+/// Move blocks
+pub fn move_blocks(
+    mut blocks: Query<(&mut Transform, ), With<Block>>
+) {
+    for mut block in blocks.iter_mut() {
+        block.0.translation.y -= 128.;
+    }
 }
 
 /// Print sprite bounding sizes

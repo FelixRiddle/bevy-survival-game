@@ -51,6 +51,7 @@ fn main() {
             camera::initialize_camera,
             block::spawn_grass_block,
             player::spawn_player,
+            block::move_blocks.after(block::spawn_grass_block)
         ))
         .add_systems(Update, (
             handle_player_input,

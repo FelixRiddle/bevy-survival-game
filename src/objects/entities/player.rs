@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::ecs::{component::Component, system::Commands};
-use bevy_rapier2d::dynamics::Velocity;
+use bevy_rapier2d::control::KinematicCharacterController;
 
 use crate::properties::Speed;
 use super::EntityBundle;
@@ -13,7 +13,6 @@ pub struct PlayerBundle {
     // Identification
     pub entity_bundle: EntityBundle,
     pub player: Player,
-    
 }
 
 /// Spawn a player
@@ -39,25 +38,33 @@ pub fn spawn_player(
 /// 
 pub fn handle_player_input(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut players: Query<(&mut Velocity, &Speed), With<Player>>
+    mut players: Query<(&mut KinematicCharacterController, &Speed), With<Player>>
 ) {
-    for (mut velocity, speed) in players.iter_mut() {
+    for (mut controller, speed) in players.iter_mut() {
         let speed = speed.0;
         
+        let mut velocity = Vec2::new(0., 0.);
+        
         if keyboard_input.pressed(KeyCode::KeyW) {
-            velocity.linvel.y = speed;
+            velocity.y = speed;
         } else if keyboard_input.pressed(KeyCode::KeyS) {
-            velocity.linvel.y = -speed;
+            velocity.y = -speed;
         } else {
-            velocity.linvel = Vec2::new(velocity.linvel.x, 0.);
+            velocity = Vec2::new(velocity.x, 0.);
         }
         
         if keyboard_input.pressed(KeyCode::KeyD) {
-            velocity.linvel.x = speed;
+            velocity.x = speed;
         } else if keyboard_input.pressed(KeyCode::KeyA) {
-            velocity.linvel.x = -speed;
+            velocity.x = -speed;
         } else {
-            velocity.linvel = Vec2::new(0., velocity.linvel.y);
+            velocity = Vec2::new(0., velocity.y);
         }
+        
+        if velocity.ne(&Vec2::new(0., 0.)) {
+            println!("Velocity: {:?}", velocity);
+        }
+        
+        controller.translation = Some(velocity);
     }
 }
