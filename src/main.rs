@@ -11,6 +11,7 @@ pub mod state_transition;
 pub mod states;
 pub mod properties;
 pub mod tutorial;
+pub mod ui;
 
 use objects::{
     block,
@@ -53,6 +54,12 @@ fn main() {
             player::spawn_player,
             block::move_blocks.after(block::spawn_grass_block)
         ))
+        // .add_systems(Startup, (
+        //     (camera::initialize_camera,),
+        //     (block::spawn_grass_block,),
+        //     (player::spawn_player,),
+        //     (block::move_blocks.after(block::spawn_grass_block),)
+        // ))
         .add_systems(Update, (
             handle_player_input,
         ))

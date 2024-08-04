@@ -10,7 +10,9 @@ use crate::properties::{
     Gravity,
     Name,
     Speed,
+    Health,
 };
+use crate::ui::inventory::Inventory;
 
 #[derive(Component)]
 pub struct Entity;
@@ -22,6 +24,7 @@ pub struct EntityBundle {
     
     // Visual name
     pub name: Name,
+    pub inventory: Inventory,
     
     // Physics and other things
     pub gravity: Gravity,
@@ -29,6 +32,9 @@ pub struct EntityBundle {
     pub rigidbody: RigidBody,
     pub collider: Collider,
     pub kinematic_character_controller: KinematicCharacterController,
+    
+    // Life
+    pub health: Health,
     
     // Rendering
     pub layer: RenderLayers,
@@ -53,7 +59,7 @@ impl EntityBundle {
     /// 
     /// 
     pub fn new(
-        asset_server: Res<AssetServer>,
+        asset_server: &Res<AssetServer>,
         name: &str
     ) -> EntityBundle {
         let name_id = name_id(name);
@@ -70,15 +76,20 @@ impl EntityBundle {
             
             // Visual name
             name: Name(name.to_string()),
+            inventory: Inventory::new(),
             
-            gravity: Gravity(5.),
+            gravity: Gravity(8.),
             speed: Speed(2.),
-            rigidbody: RigidBody::KinematicPositionBased,
+            // rigidbody: RigidBody::KinematicPositionBased,
+            rigidbody: RigidBody::Dynamic,
             collider: Collider::capsule(Vec2::new(0., 0.), Vec2::new(32., 64.), 32.),
             kinematic_character_controller: KinematicCharacterController {
                 up: Vec2::new(0., 1.),
                 ..default()
             },
+            // mass: ColliderMassProperties::Density(1.0),
+            
+            health: Health(100.0),
             
             // Rendering
             layer: FOREGROUND,

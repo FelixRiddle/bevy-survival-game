@@ -1,5 +1,9 @@
 # Learning resources
 
+Learning path
+
+- [x] [Introduction](https://bevyengine.org/learn/quick-start/introduction/)
+
 ## General
 
 - [Bevy Cheatbook](https://bevy-cheatbook.github.io/tutorial.html)

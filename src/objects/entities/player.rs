@@ -2,7 +2,11 @@ use bevy::prelude::*;
 use bevy::ecs::{component::Component, system::Commands};
 use bevy_rapier2d::control::KinematicCharacterController;
 
-use crate::properties::Speed;
+use crate::properties::{
+    Speed,
+    Username,
+    Health
+};
 use super::EntityBundle;
 
 #[derive(Component)]
@@ -13,6 +17,7 @@ pub struct PlayerBundle {
     // Identification
     pub entity_bundle: EntityBundle,
     pub player: Player,
+    pub username: Username,
 }
 
 /// Spawn a player
@@ -25,10 +30,11 @@ pub fn spawn_player(
     commands.spawn(
         PlayerBundle {
             entity_bundle: EntityBundle::new(
-                asset_server,
+                &asset_server,
                 "Player"
             ),
             player: Player,
+            username: Username("Player1".to_string()),
         }
     );
 }
@@ -68,3 +74,51 @@ pub fn handle_player_input(
         controller.translation = Some(velocity);
     }
 }
+
+/// Damage
+/// 
+/// 
+pub fn damage(
+    mut players: Query<(&mut Health, &Username), With<Player>>,
+    username: &Username,
+    damage: f32,
+) {
+    for (mut health, player_username) in players.iter_mut() {
+        if player_username.0 == username.0 {
+            health.0 -= damage;
+            if health.0 <= 0. {
+                println!("Player {} has died!", player_username.0);
+            } else {
+                println!("Player {} has taken {} damage!", player_username.0, damage);
+            }
+        }
+    }
+}
+
+/// Respawn system
+/// 
+/// 
+pub fn respawn_system(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut players: Query<(Entity, &mut Health, &Username), With<Player>>,
+) {
+    for (_entity, mut health, player_username) in players.iter_mut() {
+        if health.0 <= 0. {
+            println!("Player {} has respawned!", player_username.0);
+            health.0 = 100.;
+            commands.spawn(
+                PlayerBundle {
+                    entity_bundle: EntityBundle::new(
+                        &asset_server,
+                        "Player"
+                    ),
+                    player: Player,
+                    username: player_username.clone(),
+                }
+            );
+        }
+    }
+}
+
+
