@@ -1,5 +1,4 @@
 use bevy::{app::App, prelude::*, render::view::RenderLayers, DefaultPlugins};
-use bevy_egui::EguiPlugin;
 use bevy_rapier2d::prelude::*;
 
 pub mod camera;
@@ -21,6 +20,34 @@ const FOREGROUND: RenderLayers = RenderLayers::layer(2);
 
 use states::{AppState, GameMode, InGameState, LoadingState, PauseState};
 
+/// Function to create a platform of grass blocks
+/// 
+/// 
+fn create_grass_platform(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
+) {
+	let start_position = Vec2::new(0.0, 100.0);
+	let width = 20;
+	let height = 5;
+	
+    for x in 0..width {
+        for y in 0..height {
+            let position = start_position + Vec2::new(x as f32 * 32.0, y as f32 * 32.0);
+            // Destructure to create a temporary reference inside the loop
+            let (server,) = (&asset_server,);
+            
+            commands.spawn(
+                block::BlockBundle::new(
+                    server, // Use the temporary reference here
+                    block::BlockType::Grass,
+					Transform::from_xyz(position.x, position.y, 0.0),
+                )
+            );
+        }
+    }
+}
+
 /// Main
 ///
 ///
@@ -41,7 +68,8 @@ fn main() {
                 camera::initialize_camera,
                 block::spawn_grass_block,
                 player::spawn_player,
-                block::move_blocks.after(block::spawn_grass_block),
+                // block::move_blocks.after(block::spawn_grass_block),
+				create_grass_platform,
             ),
         )
         .add_systems(Update, (handle_player_input,))

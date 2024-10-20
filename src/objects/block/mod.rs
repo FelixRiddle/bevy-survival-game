@@ -7,6 +7,10 @@ use crate::{
     FOREGROUND
 };
 
+pub mod block_and_sprite;
+
+use block_and_sprite::BlockAndSprite;
+
 #[derive(Component)]
 pub struct Block;
 
@@ -45,7 +49,7 @@ pub struct BlockBundle {
     pub block_type: BlockType,
     
     // Shape and physics
-    pub rigidbody: RigidBody,
+	pub rigidbody: RigidBody,
     pub collider: Collider,
     
     // Layer is dependent on tangibility
@@ -53,39 +57,8 @@ pub struct BlockBundle {
     pub tangible: Tangible,
     
     // Rendering
+	// Sprite bundle includes the transform
     pub sprite: SpriteBundle,
-}
-
-pub struct BlockAndSprite {
-    pub name: Name,
-    pub sprite: SpriteBundle,
-}
-
-impl BlockAndSprite {
-    pub fn new(
-        asset_server: Res<AssetServer>,
-        block_type: BlockType,
-    ) -> BlockAndSprite {
-        
-        match block_type {
-            BlockType::Grass => {
-                let name_id = "grass";
-                // Is it possible to load jpg?, most blocks don't have transparency.
-                let sprite_path = format!("object/block/{name_id}/{name_id}.png");
-                let sprite = SpriteBundle {
-                    transform: Transform::from_xyz(0., 0., 0.),
-                    texture: asset_server.load(sprite_path),
-                    ..default()
-                };
-                
-                BlockAndSprite {
-                    name: Name(String::from("Grass")),
-                    sprite,
-                }
-            }
-            _ => panic!("Block type not implemented")
-        }
-    }
 }
 
 /// Constructors
@@ -96,12 +69,13 @@ impl BlockBundle {
     /// 
     /// 
     pub fn new(
-        asset_server: Res<AssetServer>,
+        asset_server: &Res<AssetServer>,
         block_type: BlockType,
+		transform: Transform,
     ) -> BlockBundle {
         
         // Load sprite
-        let block_and_sprite = BlockAndSprite::new(asset_server, block_type.clone());
+        let block_and_sprite = BlockAndSprite::new(asset_server, block_type.clone(), transform);
         
         BlockBundle {
             block: Block { },
@@ -121,14 +95,15 @@ impl BlockBundle {
 
 /// Spawn grass block
 /// 
-/// 
+/// Dumb function, because you can't specify the location
 pub fn spawn_grass_block(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
     commands.spawn(BlockBundle::new(
-        asset_server,
-        BlockType::Grass
+        &asset_server,
+        BlockType::Grass,
+		Transform::from_xyz(0., 0., 0.)
     ));
 }
 
